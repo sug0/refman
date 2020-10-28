@@ -1,4 +1,4 @@
-module refman
+module github.com/sug0/refman
 
 go 1.15
 
