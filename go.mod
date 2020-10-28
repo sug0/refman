@@ -12,8 +12,8 @@ require (
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/ledongthuc/pdf v0.0.0-20200323191019-23c5852adbd2
 	github.com/nickng/bibtex v1.0.3
+	github.com/pdfcpu/pdfcpu v0.3.6
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect

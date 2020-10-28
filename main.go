@@ -14,7 +14,9 @@ import (
     "path/filepath"
 
     "github.com/nickng/bibtex"
-    "github.com/ledongthuc/pdf"
+
+    pdfcpuapi "github.com/pdfcpu/pdfcpu/pkg/api"
+
     "github.com/blevesearch/bleve"
     "github.com/blevesearch/bleve/search/highlight/highlighter/ansi"
 )
@@ -135,29 +137,38 @@ func addEntry(index bleve.Index) error {
 func parseDocument() (*Document, error) {
     // parse pdf text
     logger.Printf("Opening PDF file: %s\n", pdfFile)
-    f, reader, err := pdf.Open(pdfFile)
+    ctx, err := pdfcpuapi.ReadContextFile(pdfFile)
     if err != nil {
         return nil, err
     }
-    defer f.Close()
 
     logger.Printf("Parsing PDF file: %s\n", pdfFile)
-    plainText, err := reader.GetPlainText()
-    if err != nil {
-        return nil, err
-    }
+    err = ctx.EnsurePageCount()
+	if err != nil {
+		return nil, err
+	}
 
     var txt strings.Builder
-    _, err = io.Copy(&txt, plainText)
-    if err != nil {
-        return nil, err
+
+    for i := 1; i <= ctx.PageCount; i++ {
+        plainText, err := ctx.ExtractPageContent(i)
+        if err != nil {
+            return nil, err
+        }
+        if plainText == nil {
+            continue
+        }
+        _, err = io.Copy(&txt, plainText)
+        if err != nil {
+            return nil, err
+        }
     }
 
     // parse bibtex
     var ref *bibtex.BibTex
     if bibtexFile != "" {
         logger.Printf("Attempting to parse BibTeX file: %s\n", bibtexFile)
-        f, err = os.Open(bibtexFile)
+        f, err := os.Open(bibtexFile)
         if err != nil {
             return nil, err
         }
