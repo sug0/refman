@@ -148,9 +148,9 @@ func parseDocument() (*Document, error) {
 
     logger.Printf("Parsing PDF file: %s\n", pdfFile)
     err = ctx.EnsurePageCount()
-	if err != nil {
-		return nil, err
-	}
+    if err != nil {
+        return nil, err
+    }
 
     var txt strings.Builder
 
