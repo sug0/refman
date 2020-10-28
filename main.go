@@ -10,6 +10,7 @@ import (
     "errors"
     "strings"
     "runtime"
+    "io/ioutil"
     "path/filepath"
 
     "github.com/nickng/bibtex"
@@ -31,6 +32,7 @@ var (
 
 // cmd line flags
 var (
+    verbose    bool
     pdfFile    string
     bibtexFile string
 )
@@ -38,14 +40,21 @@ var (
 // logger stuff
 var (
     logger *log.Logger
-    stderr *bufio.Writer
 )
 
 func init() {
-    // open stderr buffer
-    stderr = bufio.NewWriter(os.Stderr)
-    logger = log.New(stderr, os.Args[0], log.LstdFlags)
-    defer stderr.Flush()
+    // parse flags
+    flag.BoolVar(&verbose, "v", false, "Print logs to stderr.")
+    flag.StringVar(&pdfFile, "pdf", "", "The PDF file to parse.")
+    flag.StringVar(&bibtexFile, "bibtex", "", "The BibTeX file to parse.")
+    flag.Parse()
+
+    // configure logger
+    if verbose {
+        logger = log.New(os.Stderr, os.Args[0], log.LstdFlags)
+    } else {
+        logger = log.New(ioutil.Discard, os.Args[0], log.LstdFlags)
+    }
 
     // create and set workdir
     envDir := os.Getenv("REFMAN_WORKDIR")
@@ -73,16 +82,9 @@ skipDefaults:
         }
     }
     indexPath = filepath.Join(workDir, "index.bleve")
-
-    // parse flags
-    flag.StringVar(&pdfFile, "pdf", "", "The PDF file to parse.")
-    flag.StringVar(&bibtexFile, "bibtex", "", "The BibTeX file to parse.")
-    flag.Parse()
 }
 
 func main() {
-    defer stderr.Flush()
-
     index, err := openIndex()
     if err != nil {
         panic(err)
