@@ -107,7 +107,8 @@ func main() {
         return
     }
 
-    queryString := bleve.NewQueryStringQuery(strings.Join(args, " "))
+    s := strings.ReplaceAll(strings.Join(args, " "), "~", "-")
+    queryString := bleve.NewQueryStringQuery(s)
     searchRequest := bleve.NewSearchRequest(queryString)
     searchRequest.Highlight = bleve.NewHighlightWithStyle(ansi.Name)
 
