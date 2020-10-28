@@ -35,6 +35,7 @@ var (
 // cmd line flags
 var (
     verbose    bool
+    verbose2   bool
     pdfFile    string
     bibtexFile string
 )
@@ -47,12 +48,13 @@ var (
 func init() {
     // parse flags
     flag.BoolVar(&verbose, "v", false, "Print logs to stderr.")
+    flag.BoolVar(&verbose2, "vv", false, "Even more verbosity.")
     flag.StringVar(&pdfFile, "pdf", "", "The PDF file to parse.")
     flag.StringVar(&bibtexFile, "bibtex", "", "The BibTeX file to parse.")
     flag.Parse()
 
     // configure logger
-    if verbose {
+    if verbose || verbose2 {
         logger = log.New(os.Stderr, os.Args[0]+": ", log.LstdFlags)
     } else {
         logger = log.New(ioutil.Discard, os.Args[0]+": ", log.LstdFlags)
@@ -112,7 +114,9 @@ func main() {
     s := strings.ReplaceAll(strings.Join(args, " "), "~", "-")
     queryString := bleve.NewQueryStringQuery(s)
     searchRequest := bleve.NewSearchRequest(queryString)
-    searchRequest.Highlight = bleve.NewHighlightWithStyle(ansi.Name)
+    if verbose2 {
+        searchRequest.Highlight = bleve.NewHighlightWithStyle(ansi.Name)
+    }
 
     result, err := index.Search(searchRequest)
     if err != nil {
