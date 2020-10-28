@@ -51,9 +51,9 @@ func init() {
 
     // configure logger
     if verbose {
-        logger = log.New(os.Stderr, os.Args[0], log.LstdFlags)
+        logger = log.New(os.Stderr, os.Args[0]+": ", log.LstdFlags)
     } else {
-        logger = log.New(ioutil.Discard, os.Args[0], log.LstdFlags)
+        logger = log.New(ioutil.Discard, os.Args[0]+": ", log.LstdFlags)
     }
 
     // create and set workdir
