@@ -36,6 +36,7 @@ var (
 var (
     verbose    bool
     verbose2   bool
+    quietMode  bool
     pdfFile    string
     bibtexFile string
 )
@@ -47,6 +48,7 @@ var (
 
 func init() {
     // parse flags
+    flag.BoolVar(&quietMode, "q", false, "Quiet mode prints only matched file names.")
     flag.BoolVar(&verbose, "v", false, "Print logs to stderr.")
     flag.BoolVar(&verbose2, "vv", false, "Even more verbosity.")
     flag.StringVar(&pdfFile, "pdf", "", "The PDF file to parse.")
@@ -122,7 +124,17 @@ func main() {
     if err != nil {
         panic(err)
     }
-    fmt.Println(result)
+
+    if !quietMode {
+        fmt.Println(result)
+        return
+    }
+
+    hits := result.Hits
+
+    for i := 0; i < len(hits); i++ {
+        fmt.Println(hits[i].ID)
+    }
 }
 
 func addEntry(index bleve.Index) error {
